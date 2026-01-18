@@ -11,7 +11,7 @@
 
 ```bash
 git clone <repository-url>
-cd aitravel-fe
+cd voting-system-upb-fe
 ```
 
 ### 2. Install Dependencies
