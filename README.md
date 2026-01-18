@@ -1,4 +1,4 @@
-# AI Travel - Frontend
+# Voting System UPB - Frontend
 
 ## Prerequisites
 
