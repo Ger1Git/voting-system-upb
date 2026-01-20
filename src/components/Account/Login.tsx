@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useLoginMutation } from '../../context/auth';
 import { MdError } from 'react-icons/md';
 import { FaRegUser } from 'react-icons/fa';
@@ -59,6 +59,12 @@ const Login = () => {
                 >
                     {loginMutation.isPending ? 'Logging in...' : 'Login'}
                 </button>
+                <div className='text-center mt-4'>
+                    <span className='text-gray-600'>Don't have an account? </span>
+                    <Link to='/register' className='text-primary hover:text-accent font-semibold underline transition-colors'>
+                        Register here
+                    </Link>
+                </div>
             </form>
         </div>
     );

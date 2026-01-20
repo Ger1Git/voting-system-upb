@@ -113,21 +113,6 @@ const Navigation = () => {
                                     </Link>
                                 </li>
                             ))}
-                            {adminStatus && (
-                                <li
-                                    ref={(el) => {
-                                        navItemRefs.current['/trips/review'] = el;
-                                    }}
-                                    className="px-4 mx-4 py-2 text-xl cursor-pointer"
-                                >
-                                    <Link
-                                        to="/trips/review"
-                                        className="hover:text-gray-300"
-                                    >
-                                        Review Trips
-                                    </Link>
-                                </li>
-                            )}
                         </ul>
 
                         <span
@@ -213,18 +198,6 @@ const Navigation = () => {
                             </Link>
                         </li>
                     ))}
-                    {adminStatus && (
-                        <li className="m-4 p-2">
-                            <Link
-                                to="/trips/review"
-                                className="flex items-center justify-between text-black hover:text-gray-300"
-                                onClick={toggleMobileMenu}
-                            >
-                                Review Trips
-                                <FaChevronRight />
-                            </Link>
-                        </li>
-                    )}
                 </ul>
 
                 <div className="m-4 p-2">

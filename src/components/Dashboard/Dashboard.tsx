@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useTravelContext, type Trip } from '../../context/globalContext';
 import { Link } from 'react-router-dom';
-import TripItem from '../TripItem';
 
 const Dashboard = () => {
     const { trips, getTrips } = useTravelContext();
@@ -23,16 +22,14 @@ const Dashboard = () => {
     const renderTripItems = (tripList: Trip[]) => {
         return tripList.length > 0 ? (
             tripList.map((trip) => (
-                <TripItem
-                    key={trip.id}
-                    _id={trip.id}
-                    destination={trip.destination}
-                    startDate={trip.startDate}
-                    endDate={trip.endDate}
-                    numberOfPeople={trip.numberOfPeople}
-                    tripType={trip.tripType}
-                    budget={trip.budget}
-                />
+                <div key={trip.id} className='p-4 border border-gray-300 rounded-lg'>
+                    <h3 className='font-bold text-lg'>{trip.destination}</h3>
+                    <p>Start: {trip.startDate}</p>
+                    <p>End: {trip.endDate}</p>
+                    <p>People: {trip.numberOfPeople}</p>
+                    <p>Type: {trip.tripType}</p>
+                    <p>Budget: {trip.budget}</p>
+                </div>
             ))
         ) : (
             <p className='text-center text-xl'>No trips yet</p>
@@ -50,13 +47,6 @@ const Dashboard = () => {
                 ) : (
                     <>
                         <p className='text-center text-xl'>No trips yet</p>
-                        <p className='text-center text-xl'>
-                            To create a trip go to the
-                            <Link className='text-secondary hover:text-accent cursor-pointer mx-2 underline' to='/trips'>
-                                Trips
-                            </Link>
-                            tab
-                        </p>
                     </>
                 )}
             </div>
