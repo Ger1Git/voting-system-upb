@@ -16,8 +16,10 @@ export interface LoginCredentials {
 
 export interface RegisterCredentials {
   username: string;
-  password: string;
   email: string;
+  phone?: string;
+  address?: string;
+  idNumber?: string;
 }
 
 export interface AuthResponse {

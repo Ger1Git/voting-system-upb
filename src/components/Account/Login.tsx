@@ -55,13 +55,13 @@ const Login = () => {
                 <button
                     type='submit'
                     disabled={loginMutation.isPending}
-                    className='bg-secondary hover:bg-accent text-white cursor-pointer font-bold py-2 px-2 rounded flex justify-center items-center mt-8 transition-colors'
+                    className='bg-black hover:bg-gray-700 text-white cursor-pointer font-bold py-2 px-2 rounded flex justify-center items-center mt-8 transition-colors'
                 >
                     {loginMutation.isPending ? 'Logging in...' : 'Login'}
                 </button>
                 <div className='text-center mt-4'>
                     <span className='text-gray-600'>Don't have an account? </span>
-                    <Link to='/register' className='text-primary hover:text-accent font-semibold underline transition-colors'>
+                    <Link to='/register' className='text-primary hover:text-gray-700 font-semibold underline transition-colors'>
                         Register here
                     </Link>
                 </div>

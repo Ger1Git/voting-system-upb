@@ -35,7 +35,6 @@ const QRScanner = ({ onScanSuccess, onClose }: QRScannerProps) => {
           return;
         }
 
-        // Try to use the back camera first (environment facing)
         const backCamera = videoDevices.find(device => 
           device.label.toLowerCase().includes('back') || 
           device.label.toLowerCase().includes('environment')
@@ -56,10 +55,9 @@ const QRScanner = ({ onScanSuccess, onClose }: QRScannerProps) => {
               onScanSuccess(text);
               setTimeout(() => {
                 stopScanner();
-              }, 500); // Small delay to show the scanned value
+              }, 500);
             }
 
-            // This error happens every frame when no QR is found
             if (err && !(err instanceof NotFoundException)) {
               console.error("Scanning error:", err);
             }
@@ -76,7 +74,6 @@ const QRScanner = ({ onScanSuccess, onClose }: QRScannerProps) => {
     return () => {
       stopScanner();
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const stopScanner = () => {

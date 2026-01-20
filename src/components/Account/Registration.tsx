@@ -50,23 +50,21 @@ const Register = () => {
     };
 
     const handleQRScan = (decodedText: string) => {
-        try {
-            // Parse the QR code data (assuming it's JSON with registration info)
-            const data = JSON.parse(decodedText);
-            
-            if (data.username) setUsername(data.username);
-            if (data.email) setEmail(data.email);
-            if (data.phone) setPhone(data.phone);
-            if (data.address) setAddress(data.address);
-            if (data.idNumber) setIdNumber(data.idNumber);
-            
+        console.log('Scanned QR code content:', decodedText);
+        
+        const trimmedText = decodedText.trim();
+        
+        if (!trimmedText) {
+            setError('QR code is empty');
             setShowQRScanner(false);
-            setSuccess(false);
-            setError('');
-        } catch (err) {
-            setError('Invalid QR code format. Please scan a valid registration QR code.');
-            setShowQRScanner(false);
+            return;
         }
+        
+        // Just use the scanned text as-is in the ID number field
+        setIdNumber(trimmedText);
+        setShowQRScanner(false);
+        setSuccess(false);
+        setError('');
     };
 
     return (
