@@ -1,37 +1,49 @@
-# Voting System UPB - Frontend
+# Voting System UPB
 
-## Prerequisites
+Blockchain-based electronic voting for university students — monorepo layout.
 
-- Node.js (v16 or higher)
-- npm or yarn package manager
+| Folder | Description |
+|--------|-------------|
+| [`frontend/`](frontend/) | React + Vite SPA (badge scan, ballot UI) |
+| [`backend/`](backend/) | Node.js + Express API + ethers.js |
+| [`contracts/`](contracts/) | `VotingElection.sol` smart contract |
+| [`docs/`](docs/) | System architecture |
 
-## Getting Started
+## Architecture
 
-### 1. Clone the Repository
+[`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)
+
+## Quick start
+
+### Backend
 
 ```bash
-git clone <repository-url>
-cd voting-system-upb-fe
-```
-
-### 2. Install Dependencies
-
-```bash
+cd backend
+cp .env.example .env
 npm install
-```
-
-### 3. Run Development Server
-
-```bash
 npm run dev
 ```
 
-The application will start at `http://localhost:5173`
+API: `http://localhost:5122/api`
 
-### 4. Build for Production
+### Frontend
 
 ```bash
-npm run build
+cd frontend
+npm install
+npm run dev
 ```
 
-The production-ready files will be generated in the `dist` directory.
+App: `http://localhost:5173`
+
+Create `frontend/.env` if needed:
+
+```env
+VITE_API_BASE_URL=http://localhost:5122/api
+```
+
+## Prerequisites
+
+- Node.js 18+
+- npm
+- Local blockchain with deployed contract (see [`contracts/README.md`](contracts/README.md))

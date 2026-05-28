@@ -1,0 +1,18 @@
+[
+  "function createElection(string title, uint64 startTime, uint64 endTime) returns (uint256)",
+  "function addCandidate(uint256 electionId, string name)",
+  "function openVoting(uint256 electionId)",
+  "function closeVoting(uint256 electionId)",
+  "function publishResults(uint256 electionId)",
+  "function castVote(uint256 electionId, bytes32 voterHash, bytes32 commitment)",
+  "function revealVote(uint256 electionId, bytes32 voterHash, uint256 candidateId, bytes32 nonce)",
+  "function getHasVoted(uint256 electionId, bytes32 voterHash) view returns (bool)",
+  "function getHasRevealed(uint256 electionId, bytes32 voterHash) view returns (bool)",
+  "function getVoteCommitment(uint256 electionId, bytes32 voterHash) view returns (bytes32)",
+  "function getParticipationStats(uint256 electionId) view returns (uint256 committed, uint256 revealed)",
+  "function getResults(uint256 electionId) view returns (uint256[] candidateIds, uint256[] counts, string[] names)",
+  "function elections(uint256 electionId) view returns (uint256 id, string title, uint8 state, uint64 startTime, uint64 endTime, uint256 candidateCount, uint256 votesCommitted, uint256 votesRevealed)",
+  "function electionCount() view returns (uint256)",
+  "event VoteCommitted(uint256 indexed electionId, bytes32 indexed voterHash, bytes32 commitment, uint256 timestamp)",
+  "event VoteRevealed(uint256 indexed electionId, bytes32 indexed voterHash, uint256 candidateId)"
+]
