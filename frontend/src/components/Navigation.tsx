@@ -3,11 +3,11 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { AiOutlineMenu } from 'react-icons/ai';
 import { PiSignOut } from 'react-icons/pi';
 import { VscAccount } from 'react-icons/vsc';
-import { FaChevronRight, FaUserPlus, FaCheck } from 'react-icons/fa';
+import { FaChevronRight } from 'react-icons/fa';
 import Cookies from 'js-cookie';
 import { navItems } from '../utils/utils';
 import { isAdmin } from '../utils/jwt';
-import Icon from './Icon';
+import upbLogo from '../assets/logo-upb.png';
 
 const Navigation = () => {
     const navItemRefs = useRef<Record<string, HTMLLIElement | null>>({});
@@ -25,21 +25,17 @@ const Navigation = () => {
     const [adminStatus, setAdminStatus] = useState(false);
 
     useEffect(() => {
-        if (isAuthenticated) {
-            const admin = isAdmin();
-            console.log('Navigation - Admin status:', admin);
-            setAdminStatus(admin);
-        } else {
-            setAdminStatus(false);
-        }
-    }, [isAuthenticated, location.pathname]);
+        setAdminStatus(isAdmin());
+    }, [location.pathname, isAuthenticated]);
 
+    const visibleNavItems = navItems.filter((item) => {
+        if (item.link === '/admin/create-voting') {
+            return adminStatus;
+        }
+        return true;
+    });
     const toggleMobileMenu = () => {
         setIsMenuOpen((prev) => !prev);
-    };
-
-    const toggleProfileDropdown = () => {
-        setIsProfileDropdownOpen((prev) => !prev);
     };
 
     const handleLogout = () => {
@@ -48,23 +44,6 @@ const Navigation = () => {
         Cookies.remove('token');
         navigate('/login');
     };
-
-    // Close dropdown when clicking outside
-    useEffect(() => {
-        const handleClickOutside = (event: MouseEvent) => {
-            if (profileDropdownRef.current && !profileDropdownRef.current.contains(event.target as Node)) {
-                setIsProfileDropdownOpen(false);
-            }
-        };
-
-        if (isProfileDropdownOpen) {
-            document.addEventListener('mousedown', handleClickOutside);
-        }
-
-        return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
-        };
-    }, [isProfileDropdownOpen]);
 
     useEffect(() => {
         const activeEl = navItemRefs.current[location.pathname];
@@ -83,21 +62,22 @@ const Navigation = () => {
             <div className="flex h-21 items-center justify-between px-4 text-white">
                 <div
                     className="flex cursor-pointer items-center gap-3 py-1.25"
-                    onClick={() => navigate('/')}
+                    onClick={() => navigate('/account')}
                 >
-                    <Icon
-                        name="logo"
-                        className="h-16 w-12 text-white lg:h-20 lg:w-16"
+                    <img
+                        src={upbLogo}
+                        alt="UPB Logo"
+                        className="h-12 w-12 rounded-full bg-white p-1 object-contain lg:h-14 lg:w-14"
                     />
                     <span className="font-serif text-lg lg:text-xl">
-                        AI Travel Planner
+                        Vote UPB
                     </span>
                 </div>
 
                 <div className="hidden items-center lg:flex">
                     <nav className="relative">
                         <ul className="flex font-serif">
-                            {navItems.map(({ id, link, label }) => (
+                            {visibleNavItems.map(({ id, link, label }) => (
                                 <li
                                     key={id}
                                     ref={(el) => {
@@ -122,40 +102,36 @@ const Navigation = () => {
                     </nav>
 
                     <div className="ml-6 flex gap-4 items-center">
-                        <div className="relative" ref={profileDropdownRef}>
+                        <div
+                            className="relative"
+                            ref={profileDropdownRef}
+                            onMouseEnter={() => setIsProfileDropdownOpen(true)}
+                            onMouseLeave={() => setIsProfileDropdownOpen(false)}
+                        >
                             <VscAccount
                                 size={30}
                                 className="cursor-pointer hover:scale-110 transition-transform"
-                                onClick={toggleProfileDropdown}
                             />
                             {isProfileDropdownOpen && (
-                                <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-200">
+                                <div className="absolute right-0 top-full pt-1 z-50">
+                                    <div className="w-48 bg-white rounded-md shadow-lg py-1 border border-gray-200">
                                     <Link
                                         to="/account"
-                                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2"
+                                        className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2"
                                         onClick={() => setIsProfileDropdownOpen(false)}
                                     >
                                         <VscAccount size={18} />
                                         My Account
                                     </Link>
-                                    {adminStatus && (
-                                        <Link
-                                            to="/register"
-                                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2"
-                                            onClick={() => setIsProfileDropdownOpen(false)}
-                                        >
-                                            <FaUserPlus size={18} />
-                                            Create Account
-                                        </Link>
-                                    )}
                                     <div className="border-t border-gray-200 my-1"></div>
                                     <button
                                         onClick={handleLogout}
-                                        className="w-full text-left block px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
+                                        className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
                                     >
                                         <PiSignOut size={18} />
                                         Logout
                                     </button>
+                                    </div>
                                 </div>
                             )}
                         </div>
@@ -186,7 +162,7 @@ const Navigation = () => {
                 `}
             >
                 <ul className="mt-6">
-                    {navItems.map(({ id, link, label }) => (
+                    {visibleNavItems.map(({ id, link, label }) => (
                         <li key={id} className="m-4 p-2">
                             <Link
                                 to={link}

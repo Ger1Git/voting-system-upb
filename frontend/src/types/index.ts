@@ -17,9 +17,11 @@ export interface LoginCredentials {
 export interface RegisterCredentials {
   username: string;
   email: string;
+  password: string;
+  studentId?: string;
+  faculty: string;
+  cnp?: string;
   phone?: string;
-  address?: string;
-  idNumber?: string;
 }
 
 export interface AuthResponse {

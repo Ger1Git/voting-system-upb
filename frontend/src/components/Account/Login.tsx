@@ -18,7 +18,7 @@ const Login = () => {
         setError('');
         try {
             await loginMutation.mutateAsync({ username, password });
-            navigate('/dashboard');
+            navigate('/votings');
         } catch (error) {
             setError('Login failed. Please check your credentials.');
         }

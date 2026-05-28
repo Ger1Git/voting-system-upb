@@ -9,6 +9,24 @@ import {
 } from '../blockchain/blockchainClient.js';
 
 const STATE_LABELS = ['Created', 'VotingOpen', 'VotingClosed', 'ResultsPublished'];
+const FACULTY_SCOPE_REGEX = /\s*\[FACULTY:([A-Za-z0-9_-]+)\]\s*$/;
+
+export function attachFacultyScopeToTitle(title, faculty) {
+  const cleanTitle = String(title || '').trim();
+  const cleanFaculty = String(faculty || '').trim().toUpperCase();
+  if (!cleanFaculty || cleanFaculty === 'ALL') {
+    return cleanTitle;
+  }
+  return `${cleanTitle} (Only for ${cleanFaculty})`;
+}
+
+export function extractFacultyScopeFromTitle(title) {
+  const match = String(title || '').match(FACULTY_SCOPE_REGEX);
+  if (!match) {
+    return null;
+  }
+  return match[1].toUpperCase();
+}
 
 /**
  * Organizer operations: election pool lifecycle only — no ballot or tally access.
@@ -48,12 +66,12 @@ export async function listElections() {
 }
 
 export async function getElectionDetail(electionId) {
-  const e = await getElectionFromChain(Number(electionId));
+  const election = await getElectionFromChain(Number(electionId));
   return {
-    ...e,
-    stateLabel: STATE_LABELS[e.state] ?? 'Unknown',
-    votingOpen: e.state === 1,
-    resultsVisible: e.state === 3,
+    ...election,
+    stateLabel: STATE_LABELS[election.state] ?? 'Unknown',
+    votingOpen: election.state === 1,
+    resultsVisible: election.state === 3,
   };
 }
 

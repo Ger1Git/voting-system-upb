@@ -1,21 +1,40 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useRegisterMutation } from '../../context/auth';
-import { MdError, MdCheckCircle, MdQrCodeScanner, MdPhone, MdLocationOn } from 'react-icons/md';
+import { MdError, MdCheckCircle, MdPhone } from 'react-icons/md';
 import { FaRegUser, FaIdCard } from 'react-icons/fa';
-import { MdEmail } from 'react-icons/md';
+import { MdEmail, MdLock } from 'react-icons/md';
 import Input from '../Input';
-import QRScanner from '../QRScanner';
+import { apiClient } from '../../utils/axiosConfig';
+import { API_PATHS } from '../../utils/constants';
 
 const Register = () => {
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [studentId, setStudentId] = useState('');
+    const [faculty, setFaculty] = useState('');
+    const [cnp, setCnp] = useState('');
     const [phone, setPhone] = useState('');
-    const [address, setAddress] = useState('');
-    const [idNumber, setIdNumber] = useState('');
+    const [facultyOptions, setFacultyOptions] = useState<string[]>([]);
+    const [loadingFaculties, setLoadingFaculties] = useState(true);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState(false);
-    const [showQRScanner, setShowQRScanner] = useState(false);
     const registerMutation = useRegisterMutation();
+
+    useEffect(() => {
+        const fetchFaculties = async () => {
+            try {
+                const res = await apiClient.get<{ faculties: string[] }>(API_PATHS.faculties);
+                setFacultyOptions(res.data.faculties || []);
+            } catch {
+                setError('Failed to load faculty options.');
+            } finally {
+                setLoadingFaculties(false);
+            }
+        };
+        fetchFaculties();
+    }, []);
 
     const handleRegister = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -23,7 +42,7 @@ const Register = () => {
         setSuccess(false);
 
         // Validate required fields
-        if (!username || !email) {
+        if (!username || !email || !password || !studentId || !faculty || !cnp) {
             setError('Please fill in all required fields');
             return;
         }
@@ -32,61 +51,32 @@ const Register = () => {
             await registerMutation.mutateAsync({ 
                 username, 
                 email,
+                password,
+                studentId,
+                faculty,
+                cnp,
                 phone,
-                address,
-                idNumber
             });
             setSuccess(true);
             // Clear form fields after successful creation
             setUsername('');
             setEmail('');
+            setPassword('');
+            setStudentId('');
+            setFaculty('');
+            setCnp('');
             setPhone('');
-            setAddress('');
-            setIdNumber('');
         } catch (error) {
             const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
             setError(errorMessage);
         }
     };
 
-    const handleQRScan = (decodedText: string) => {
-        console.log('Scanned QR code content:', decodedText);
-        
-        const trimmedText = decodedText.trim();
-        
-        if (!trimmedText) {
-            setError('QR code is empty');
-            setShowQRScanner(false);
-            return;
-        }
-        
-        // Just use the scanned text as-is in the ID number field
-        setIdNumber(trimmedText);
-        setShowQRScanner(false);
-        setSuccess(false);
-        setError('');
-    };
-
     return (
         <div className='order-2 lg:order-1 bg-white p-7 rounded-lg shadow-xl border border-gray-200 text-gray-800 w-80 md:w-[32rem]'>
-            {showQRScanner && (
-                <QRScanner
-                    onScanSuccess={handleQRScan}
-                    onClose={() => setShowQRScanner(false)}
-                />
-            )}
             <form onSubmit={handleRegister} className='flex flex-col justify-center'>
                 <h1 className='text-3xl font-bold mb-6 text-center'>Create Account</h1>
-                
-                <button
-                    type='button'
-                    onClick={() => setShowQRScanner(true)}
-                    className='bg-black hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded flex justify-center items-center mb-4 transition-colors'
-                >
-                    <MdQrCodeScanner className='mr-2 h-5 w-5' />
-                    Scan QR Code to Fill Form
-                </button>
-                
+
                 {error && (
                     <div className='flex items-center mb-2 bg-red-50 border border-red-200 rounded-md p-2'>
                         <MdError className='mr-2 h-5 w-5' color={'#b30404'} />
@@ -96,7 +86,7 @@ const Register = () => {
                 {success && (
                     <div className='flex items-center mb-2 bg-green-50 border border-green-200 rounded-md p-3'>
                         <MdCheckCircle className='mr-2 h-5 w-5' color={'#10b981'} />
-                        <span className='text-green-700 font-medium'>Account created successfully! Password has been sent to your email.</span>
+                        <span className='text-green-700 font-medium'>Account created successfully! You can log in now.</span>
                     </div>
                 )}
                 
@@ -111,16 +101,44 @@ const Register = () => {
                         placeholder='Enter full name'
                         icon={<FaRegUser />}
                         onChange={(e) => setUsername(e.target.value)}
-                        required
                     />
                     <Input
-                        label='ID Number'
+                        label='Student ID *'
                         type='text'
-                        name='idNumber'
-                        value={idNumber}
-                        placeholder='Enter ID number'
+                        name='studentId'
+                        value={studentId}
+                        placeholder='Enter student ID'
                         icon={<FaIdCard />}
-                        onChange={(e) => setIdNumber(e.target.value)}
+                        onChange={(e) => setStudentId(e.target.value)}
+                    />
+                    <div className='mb-4'>
+                        <label className='block text-sm font-semibold mb-1'>Faculty *</label>
+                        <select
+                            name='faculty'
+                            value={faculty}
+                            onChange={(e) => setFaculty(e.target.value)}
+                            className='w-full border rounded px-3 py-2 bg-white'
+                            disabled={loadingFaculties}
+                            required
+                        >
+                            <option value=''>
+                                {loadingFaculties ? 'Loading faculties...' : 'Select faculty'}
+                            </option>
+                            {facultyOptions.map((option) => (
+                                <option key={option} value={option}>
+                                    {option}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                    <Input
+                        label='CNP *'
+                        type='text'
+                        name='cnp'
+                        value={cnp}
+                        placeholder='Enter CNP'
+                        icon={<FaIdCard />}
+                        onChange={(e) => setCnp(e.target.value)}
                     />
                     <Input
                         label='Phone Number'
@@ -130,15 +148,6 @@ const Register = () => {
                         placeholder='Enter phone number'
                         icon={<MdPhone />}
                         onChange={(e) => setPhone(e.target.value)}
-                    />
-                    <Input
-                        label='Address'
-                        type='text'
-                        name='address'
-                        value={address}
-                        placeholder='Enter address'
-                        icon={<MdLocationOn />}
-                        onChange={(e) => setAddress(e.target.value)}
                     />
                 </div>
                 
@@ -153,10 +162,18 @@ const Register = () => {
                         placeholder='Enter email address'
                         icon={<MdEmail />}
                         onChange={(e) => setEmail(e.target.value)}
-                        required
+                    />
+                    <Input
+                        label='Password *'
+                        type='password'
+                        name='password'
+                        value={password}
+                        placeholder='Choose a password'
+                        icon={<MdLock />}
+                        onChange={(e) => setPassword(e.target.value)}
                     />
                     <p className='text-sm text-gray-600 mt-2 bg-blue-50 p-3 rounded-md border border-blue-200'>
-                        Your account password will be automatically generated and sent to your email address.
+                        Use this email and password to log in after registration.
                     </p>
                 </div>
                 <button
@@ -166,6 +183,12 @@ const Register = () => {
                 >
                     {registerMutation.isPending ? 'Creating the account...' : 'Create Account'}
                 </button>
+                <Link
+                    to='/login'
+                    className='mt-2 border border-gray-300 text-gray-700 hover:bg-gray-100 font-semibold py-2 px-2 rounded flex justify-center items-center transition-colors'
+                >
+                    Back to Login
+                </Link>
             </form>
         </div>
     );

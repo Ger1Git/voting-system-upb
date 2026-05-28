@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { requireAuth } from '../middleware/auth.middleware.js';
 import {
+  attachFacultyScopeToTitle,
   organizerCloseVoting,
   organizerCreateElection,
   organizerOpenVoting,
@@ -11,15 +12,15 @@ const router = Router();
 
 router.use(requireAuth(['Admin', 'Organizer']));
 
-/** Organizer: create election pool and candidates — cannot read or alter votes. */
 router.post('/elections', async (req, res, next) => {
   try {
-    const { title, startTime, endTime, candidates } = req.body;
+    const { title, startTime, endTime, candidates, faculty } = req.body;
     if (!title || startTime == null || endTime == null) {
       return res.status(400).json({ error: 'title, startTime, endTime are required' });
     }
+    const scopedTitle = attachFacultyScopeToTitle(title, faculty);
     const result = await organizerCreateElection({
-      title,
+      title: scopedTitle,
       startTime: Number(startTime),
       endTime: Number(endTime),
       candidates: candidates ?? [],

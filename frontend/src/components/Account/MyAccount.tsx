@@ -71,14 +71,22 @@ const MyAccount = () => {
 
                     <div className='pt-6 border-t border-gray-200'>
                         <div className='flex flex-col sm:flex-row gap-4 items-start sm:items-center'>
+                            <Link
+                                to='/face-check'
+                                className='px-6 py-2 bg-black text-white rounded-md hover:bg-gray-700 transition-colors shadow-md'
+                            >
+                                Face Verification
+                            </Link>
                             {adminStatus && (
-                                <Link
-                                    to='/register'
-                                    className='px-6 py-2 bg-primary text-white rounded-md hover:bg-secondary transition-colors flex items-center justify-center gap-2 shadow-md'
-                                >
-                                    <FaUserPlus size={18} />
-                                    Create Account
-                                </Link>
+                                <>
+                                    <Link
+                                        to='/register'
+                                        className='px-6 py-2 bg-primary text-white rounded-md hover:bg-secondary transition-colors flex items-center justify-center gap-2 shadow-md'
+                                    >
+                                        <FaUserPlus size={18} />
+                                        Create Account
+                                    </Link>
+                                </>
                             )}
                             <button
                                 onClick={handleLogout}

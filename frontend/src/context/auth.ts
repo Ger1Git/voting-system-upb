@@ -2,24 +2,20 @@ import { useMutation } from "@tanstack/react-query";
 import Cookies from "js-cookie";
 import { LoginCredentials, RegisterCredentials, AuthResponse } from "../types";
 import { apiClient } from "../utils/axiosConfig";
+import { API_PATHS, AUTH_COOKIE_KEY } from "../utils/constants";
 
 const login = async ({ username, password }: LoginCredentials): Promise<string> => {
   const response = await apiClient.post<AuthResponse>(
-    "/loginservice/login",
-    { Email: username, Password: password }
+    API_PATHS.login,
+    { email: username, password }
   );
   return response.data.token;
 };
 
-const register = async ({ username, password, email }: RegisterCredentials): Promise<{ success: boolean; userId: number; message: string }> => {
-  const token = Cookies.get("token");
-  if (!token) {
-    throw new Error("Authentication required. Only administrators can create accounts.");
-  }
-
+const register = async ({ username, email, password, studentId, faculty, cnp, phone }: RegisterCredentials): Promise<{ success: boolean; userId: number; message: string }> => {
   const response = await apiClient.post<{ success: boolean; userId: number; message: string }>(
-    "/loginservice/register",
-    { FullName: username, Email: email, Password: password }
+    API_PATHS.register,
+    { fullName: username, email, password, studentId, faculty, cnp, phone }
   );
   return response.data;
 };
@@ -28,7 +24,7 @@ const useLoginMutation = () => {
   return useMutation({
     mutationFn: login,
     onSuccess: (data) => {
-      Cookies.set("token", data, { expires: 1 });
+      Cookies.set(AUTH_COOKIE_KEY, data, { expires: 1 });
     },
   });
 };

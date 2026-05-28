@@ -1,9 +1,6 @@
 import { keccak256, solidityPacked } from 'ethers';
+import { STORAGE_KEYS } from './constants';
 
-/**
- * Compute on-chain commitment (must match VotingElection.sol).
- * Run in browser so backend never needs candidateId/nonce at rest.
- */
 export function computeVoteCommitment(
   voterHashHex: string,
   candidateId: number,
@@ -22,13 +19,13 @@ export function computeVoteCommitment(
 
 export function generateNonce(): string {
   const bytes = new Uint8Array(32);
+
   crypto.getRandomValues(bytes);
+
   return Array.from(bytes)
     .map((b) => b.toString(16).padStart(2, '0'))
     .join('');
 }
-
-const STORAGE_KEY = 'upb_vote_secrets';
 
 export type VoteSecret = {
   electionId: number;
@@ -38,12 +35,15 @@ export type VoteSecret = {
 };
 
 export function saveVoteSecret(secret: VoteSecret): void {
-  const key = `${STORAGE_KEY}_${secret.electionId}`;
-  localStorage.setItem(key, JSON.stringify(secret));
+  localStorage.setItem(`${STORAGE_KEYS.voteSecrets}_${secret.electionId}`, JSON.stringify(secret));
 }
 
 export function loadVoteSecret(electionId: number): VoteSecret | null {
-  const raw = localStorage.getItem(`${STORAGE_KEY}_${electionId}`);
+  const raw = localStorage.getItem(`${STORAGE_KEYS.voteSecrets}_${electionId}`);
   if (!raw) return null;
-  return JSON.parse(raw) as VoteSecret;
+  try {
+    return JSON.parse(raw) as VoteSecret;
+  } catch {
+    return null;
+  }
 }

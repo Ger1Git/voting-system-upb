@@ -1,24 +1,19 @@
 import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
 import Cookies from 'js-cookie';
+import { API_BASE_URL, AUTH_COOKIE_KEY } from './constants';
 
-const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5122/api';
-
-// Create axios instance
 export const apiClient = axios.create({
-  baseURL: BASE_URL,
+  baseURL: API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
   },
   withCredentials: true,
 });
 
-// Request interceptor to add token (skip for login endpoint only)
 apiClient.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
-    const token = Cookies.get('token');
-    // Don't add token for login endpoint (register needs it for admin auth)
-    const isLoginEndpoint = config.url?.includes('/loginservice/login');
-    if (token && config.headers && !isLoginEndpoint) {
+    const token = Cookies.get(AUTH_COOKIE_KEY);
+    if (token && config.headers) {
       config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
@@ -36,7 +31,7 @@ apiClient.interceptors.response.use(
   (error: AxiosError) => {
     if (error.response?.status === 401) {
       // Token expired or invalid
-      Cookies.remove('token');
+      Cookies.remove(AUTH_COOKIE_KEY);
       
       // Only redirect if we're not already on the login or register page
       const currentPath = window.location.pathname;

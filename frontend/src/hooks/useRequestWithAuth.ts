@@ -2,18 +2,18 @@ import { useCallback } from 'react';
 import { apiClient } from '../utils/axiosConfig';
 import Cookies from 'js-cookie';
 import { isTokenExpired } from '../utils/jwt';
+import { AUTH_COOKIE_KEY } from '../utils/constants';
 
 const useRequestWithAuth = () => {
-    const token = Cookies.get('token');
+    const token = Cookies.get(AUTH_COOKIE_KEY);
 
     const request = useCallback(async <T>(url: string, method: string = 'GET', data: any = null, skipAuth: boolean = false): Promise<T> => {
         if (!skipAuth && !token) {
             throw new Error('No token found');
         }
 
-        // Check if token is expired before making request
         if (!skipAuth && token && isTokenExpired()) {
-            Cookies.remove('token');
+            Cookies.remove(AUTH_COOKIE_KEY);
             if (window.location.pathname !== '/login') {
                 window.location.href = '/login';
             }
@@ -37,7 +37,12 @@ const useRequestWithAuth = () => {
             if (error.response?.status === 401) {
                 throw new Error('Your session has expired. Please log in again.');
             }
-            throw new Error(error.response?.data?.message || error.message || 'An error occurred');
+            throw new Error(
+                error.response?.data?.error ||
+                error.response?.data?.message ||
+                error.message ||
+                'An error occurred'
+            );
         }
     }, [token]);
 
